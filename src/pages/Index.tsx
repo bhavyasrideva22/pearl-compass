@@ -1,13 +1,42 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from "react";
+import { AssessmentIntro } from "@/components/assessment/AssessmentIntro";
+import { AssessmentFlow } from "@/components/assessment/AssessmentFlow";
+import { AssessmentResults } from "@/components/assessment/AssessmentResults";
+
+type AssessmentState = "intro" | "assessment" | "results";
+
+interface AssessmentResults {
+  overallScore: number;
+  sectionScores: Record<string, number>;
+  responses: Record<string, string>;
+}
 
 const Index = () => {
+  const [currentState, setCurrentState] = useState<AssessmentState>("intro");
+  const [results, setResults] = useState<AssessmentResults | null>(null);
+
+  const handleStart = () => {
+    setCurrentState("assessment");
+  };
+
+  const handleComplete = (assessmentResults: AssessmentResults) => {
+    setResults(assessmentResults);
+    setCurrentState("results");
+  };
+
+  const handleRestart = () => {
+    setResults(null);
+    setCurrentState("intro");
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
+    <>
+      {currentState === "intro" && <AssessmentIntro onStart={handleStart} />}
+      {currentState === "assessment" && <AssessmentFlow onComplete={handleComplete} />}
+      {currentState === "results" && results && (
+        <AssessmentResults results={results} onRestart={handleRestart} />
+      )}
+    </>
   );
 };
 
